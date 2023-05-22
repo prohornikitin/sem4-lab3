@@ -1,0 +1,59 @@
+#include <alloc.h>
+#include <cstdlib>
+#include <mutex>
+#include <memory>
+
+
+template <class T>
+T* align(void* addr, size_t space) {
+	return (T*)std::align(alignof(T), sizeof(T), addr, space);
+}
+
+
+
+
+struct BlockMetadata {
+	BlockMetadata* next = nullptr;
+	BlockMetadata* prev = nullptr;
+	size_t size = 0;
+	bool is_free;
+};
+
+
+struct MmappedMetadata {
+	MmappedMetadata * next;
+	MmappedMetadata * prev;
+	size_t size;
+
+	bool is_free() {
+		uintptr_t end_of_this = (uintptr_t)(this+1);
+		uintptr_t end_of_unit = ((uintptr_t)this) + size;
+		auto max_block_size = end_of_unit - end_of_this
+		auto first_block = align<BlockMetadata>((void*)end_of_this, max_block_size);
+		max_block_size = 
+		return first_block->is_free && 
+	}
+};
+
+
+
+std::mutex mutex;
+
+
+
+void * my_malloc(size_t size) {
+	return malloc(size);
+}
+
+void * my_calloc(size_t num, size_t size) {
+	return calloc(num, size);
+}
+
+void * my_realloc(void *ptr, size_t new_size) {
+	return realloc(ptr, new_size);
+}
+
+
+void my_free(void* ptr) {
+	free(ptr);
+}
